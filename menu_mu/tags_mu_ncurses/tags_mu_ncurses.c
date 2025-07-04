@@ -241,6 +241,20 @@ void parse_tags(const wchar_t *input, wchar_t *output, int max_output, attr_t *a
         L"</x>",
         L"</y>",
         L"</z>",
+        L"</ka>",
+        L"</ki>",
+        L"</la>",
+        L"</li>",
+        L"</ma>",
+        L"</mi>",
+        L"</na>",
+        L"</ni>",
+        L"</oa>",
+        L"</oi>",
+        L"</pa>",
+        L"</pi>",
+        L"</qa>",
+        L"</qi>",
         NULL
     };
     const wchar_t *replacement = L"<error>";
@@ -254,6 +268,7 @@ void parse_tags(const wchar_t *input, wchar_t *output, int max_output, attr_t *a
     int in_gray = 0;
     int in_hash_tag = 0;
     int in_a_tag = 0;
+    int in_restricted_tag = 0; // Добавлено
 
     while (*ptr && out_idx < max_output - 1 && attr_idx < max_output - 1) {
         // Проверка на хэш-тег <#>
@@ -290,62 +305,44 @@ void parse_tags(const wchar_t *input, wchar_t *output, int max_output, attr_t *a
         }
         if (found_forbidden) continue;
 
-// Проверка на тег <a> для обработки вложенных <r> или </r> -----------------------------
-if (wcsncmp(ptr, L"<a>", 3) == 0) {
-    in_gray = 1;
-    const wchar_t *start_i = ptr;
-    ptr += 3;
-    const wchar_t *content_start = ptr;
-    while (*ptr && wcsncmp(ptr, L"</a>", 4) != 0) {
-        if (wcsncmp(ptr, L"<r>", 3) == 0 || wcsncmp(ptr, L"</r>", 4) == 0) {
-            for (size_t j = 0; error_msg[j] && out_idx < max_output - 1; j++) {
-                output[out_idx] = error_msg[j];
-                attributes[attr_idx] = COLOR_PAIR(3);
-                out_idx++;
-                attr_idx++;
+// Проверка на невалидные теги для обработки вложенных <r> </r> -----------------------------------------------------------------------------
+const wchar_t *open_tags[]  = {
+ L"<a>",  L"<i>",  L"<ka>", L"<ki>", L"<la>", L"<li>", L"<ma>", L"<mi>", L"<na>", L"<ni>", L"<oa>", L"<oi>", L"<pa>", L"<pi>", L"<qa>", L"<qi>", NULL
+ };
+const wchar_t *close_tags[] = {
+ L"</a>", L"</i>", L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  L"</>",  NULL
+ };
+
+for (int i = 0; open_tags[i]; i++) {
+    size_t tag_len = wcslen(open_tags[i]);
+    if (wcsncmp(ptr, open_tags[i], tag_len) == 0) {
+        in_restricted_tag = 1;
+        const wchar_t *start_i = ptr;
+        ptr += tag_len;
+        const wchar_t *content_start = ptr;
+        while (*ptr && wcsncmp(ptr, close_tags[i], wcslen(close_tags[i])) != 0) {
+            if (wcsncmp(ptr, L"<r>", 3) == 0 || wcsncmp(ptr, L"</r>", 4) == 0) {
+                for (size_t j = 0; error_msg[j] && out_idx < max_output - 1; j++) {
+                    output[out_idx] = error_msg[j];
+                    attributes[attr_idx] = COLOR_PAIR(3);
+                    out_idx++;
+                    attr_idx++;
+                }
+                ptr = content_start;
+                while (*ptr && wcsncmp(ptr, close_tags[i], wcslen(close_tags[i])) != 0) ptr++;
+                if (*ptr) ptr += wcslen(close_tags[i]);
+                in_restricted_tag = 0;
+                goto continue_loop;
             }
-            ptr = content_start;
-            while (*ptr && wcsncmp(ptr, L"</a>", 4) != 0) ptr++;
-            if (*ptr) ptr += 4;
-            in_gray = 0;
-            goto continue_loop;
+            ptr++;
         }
-        ptr++;
-    }
-    if (wcsncmp(ptr, L"</r>", 4) == 0) {
-        ptr += 4;
-        in_gray = 0;
-    } else {
-        ptr = start_i;
-    }
-}
-// Проверка на тег <i> для обработки вложенных <r> или </r>
-if (wcsncmp(ptr, L"<i>", 3) == 0) {
-    in_gray = 1;
-    const wchar_t *start_i = ptr;
-    ptr += 3;
-    const wchar_t *content_start = ptr;
-    while (*ptr && wcsncmp(ptr, L"</i>", 4) != 0) {
-        if (wcsncmp(ptr, L"<r>", 3) == 0 || wcsncmp(ptr, L"</r>", 4) == 0) {
-            for (size_t j = 0; error_msg[j] && out_idx < max_output - 1; j++) {
-                output[out_idx] = error_msg[j];
-                attributes[attr_idx] = COLOR_PAIR(3);
-                out_idx++;
-                attr_idx++;
-            }
-            ptr = content_start;
-            while (*ptr && wcsncmp(ptr, L"</i>", 4) != 0) ptr++;
-            if (*ptr) ptr += 4;
-            in_gray = 0;
-            goto continue_loop;
+        if (wcsncmp(ptr, L"</r>", 4) == 0) {
+            ptr += 4;
+            in_restricted_tag = 0;
+        } else {
+            ptr = start_i;
         }
-        ptr++;
-    }
-    if (wcsncmp(ptr, L"</r>", 4) == 0) {
-        ptr += 4;
-        in_gray = 0;
-    } else {
-        ptr = start_i;
+        break;
     }
 }
 //---
@@ -366,8 +363,19 @@ if (wcsncmp(ptr, L"<i>", 3) == 0) {
                 } else if (wcscmp(tag_mappings[j].tag, TAG_RESET_GRAY) == 0) {
                     in_gray = 0;
                     current_attr &= ~(A_DIM | COLOR_PAIR(11));
+// Делает текст серым на фоне.
+} else if (wcscmp(tag_mappings[j].tag, TAG_JI) == 0 ||
+           wcscmp(tag_mappings[j].tag, TAG_KI) == 0 ||
+           wcscmp(tag_mappings[j].tag, TAG_LI) == 0 ||
+           wcscmp(tag_mappings[j].tag, TAG_MI) == 0 ||
+           wcscmp(tag_mappings[j].tag, TAG_NI) == 0 ||
+           wcscmp(tag_mappings[j].tag, TAG_OI) == 0 ||
+           wcscmp(tag_mappings[j].tag, TAG_PI) == 0 ||
+           wcscmp(tag_mappings[j].tag, TAG_QI) == 0) {
+    current_attr = (current_attr & A_BOLD) | tag_mappings[j].attribute | A_DIM;
+//
                 } else if (wcscmp(tag_mappings[j].tag, TAG_BOLD) == 0) {
-                    if (!in_black && !in_gray) {
+                    if (!in_black && !in_gray && !in_restricted_tag) {
                         current_attr |= A_BOLD;
                     }
                 } else if (wcscmp(tag_mappings[j].tag, TAG_NEWLINE) == 0) {
