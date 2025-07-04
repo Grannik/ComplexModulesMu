@@ -32,7 +32,7 @@ void draw_menu(void) {
     for (int j = left_length + menu_text_length + 1; j < total_width - 1; j++) mvprintw(0, j, "═");
     mvprintw(0, total_width - 1, "╗");
 // Цикл боковых рамок.
-    for (int i = 1; i <= 27; i++) {
+    for (int i = 1; i <= 29; i++) {
         mvprintw(i, 0, "║");
         mvprintw(i, 63, "║");
     }
@@ -53,27 +53,27 @@ void draw_menu(void) {
     int special_menu_text_length = 16;
     int special_left_length = (61 - special_menu_text_length) / 2;
     int special_menu_start_pos = special_left_length + 1;
-    mvprintw(22, 0, "╟");
+    mvprintw(24, 0, "╟");
     for (int j = 1; j <= special_left_length; j++) {
-    mvprintw(22, j, "─");
+    mvprintw(24, j, "─");
 }
-    mvprintw(22, special_menu_start_pos, "┤ Special tags ├");
+    mvprintw(24, special_menu_start_pos, "┤ Special tags ├");
     for (int j = special_menu_start_pos + special_menu_text_length; j < 63; j++) {
-    mvprintw(22, j, "─");
+    mvprintw(24, j, "─");
 }
-    mvprintw(22, 63, "╢");
+    mvprintw(24, 63, "╢");
 //--- Перемычка после специальных тегов ------------
-    mvprintw(26, 0, "╟");          // Левая часть.
+    mvprintw(28, 0, "╟");          // Левая часть.
     for (int j = 1; j < 63; j++) {
-    mvprintw(26, j, "─");          // Сама перемычка
+    mvprintw(28, j, "─");          // Сама перемычка
 }
-    mvprintw(26, 63, "╢");         // Правая часть.
+    mvprintw(28, 63, "╢");         // Правая часть.
 //--- Нижняя часть рамки ---------------------------
-    mvprintw(28, 0, "╚");          // Левая часть.
+    mvprintw(30, 0, "╚");          // Левая часть.
     for (int j = 1; j < 63; j++) {
-    mvprintw(28, j, "═");          // Сама перемычка
+    mvprintw(30, j, "═");          // Сама перемычка
 }
-   mvprintw(28, 63, "╝");         // Правая часть.
+   mvprintw(30, 63, "╝");         // Правая часть.
 //--- Определение текстовых полей с тегами ---------
     attroff(COLOR_PAIR(4));
     const wchar_t *title = L"          <r>*** Tag information in the TTY menu ***";
@@ -102,7 +102,7 @@ void draw_menu(void) {
     attr_t attributes[1024];
         int attr_count = 0;
         parse_tags(body, body_buf, 1024, attributes, &attr_count);
-        print_tagged_text(body_buf, 3, 23, attributes, attr_count, 62);
+        print_tagged_text(body_buf, 3, 25, attributes, attr_count, 62);
     }
     // Парсинг и вывод footer
     {
@@ -110,7 +110,7 @@ void draw_menu(void) {
     attr_t attributes[1024];
         int attr_count = 0;
         parse_tags(footer, footer_buf, 1024, attributes, &attr_count);
-        print_tagged_text(footer_buf, 3, 27, attributes, attr_count, 64);
+        print_tagged_text(footer_buf, 3, 29, attributes, attr_count, 64);
     }
     refresh();
 }
@@ -241,8 +241,8 @@ void init_menu_items(MenuItem items[]) {
 //  items[19]
     items[19] = (MenuItem){
         .description = L"<k>| <<k>k> | \\033[41m | <r><<r>r> Bold</r> <</r>/r> text | Выделение жирным |",
-        .details = {L"<k>| <<k>k>  <r><<r>r> Bold</r> <</r>/r> text                                   |",
-                    L"<ka>| <<ka>ka> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+        .details = {L"<k>| <<k>k>  <r><<r>r> Bold</r> <</r>/r> text                           |",
+                    L" <ka><r></r></> <</>ka><</>r><</>/r><</>/> <</>/ka> Invalid tag combination",
                     L"<kb>| <<kb>kb> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<kc>| <<kc>kc> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<kd>| <<kd>kd> <r><<r>r> Bold</r> <</r>/r> text |",
@@ -250,17 +250,15 @@ void init_menu_items(MenuItem items[]) {
                     L"<kf>| <<kf>kf> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<kg>| <<kg>kg> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<kh>| <<kh>kh> <r><<r>r> Bold</r> <</r>/r> text |",
-                    L"<ki>| <<ki>ki> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
-//        L"<a> text Bold text </a></> | <c> text <r> Bold </r> text </c>",
-  //      L"Для уорректной работы необходимо применить двойное закрытие тегов:"
+                    L" <ki><r></r></> <</>ki><</>r><</>/r><</>/> <</>/ki> Invalid tag combination",
 },
         .detail_lines = 10
     };
 //  items[20]
     items[20] = (MenuItem){
         .description = L"<l>| <<l>l> | \\033[42m | <r><<r>r> Bold</r> <</r>/r> text | Выделение жирным |",
-        .details = {L"<l>| <<l>l>  <r><<r>r> Bold</r> <</r>/r> text                                   |",
-                    L"<la>| <<la>la> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+        .details = {L"<l>| <<l>l>  <r><<r>r> Bold</r> <</r>/r> text                           |",
+                    L" <la><r></r></> <</>la><</>r><</>/r><</>/> <</>/la> Invalid tag combination",
                     L"<lb>| <<lb>lb> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<lc>| <<lc>lc> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<ld>| <<ld>ld> <r><<r>r> Bold</r> <</r>/r> text |",
@@ -268,15 +266,15 @@ void init_menu_items(MenuItem items[]) {
                     L"<lf>| <<lf>lf> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<lg>| <<lg>lg> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<lh>| <<lh>lh> <r><<r>r> Bold</r> <</r>/r> text |",
-                    L"<li>| <<li>li> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+                    L" <li><r></r></> <</>li><</>r><</>/r><</>/> <</>/li> Invalid tag combination",
 },
         .detail_lines = 10
     };
 //  items[21]
     items[21] = (MenuItem){
         .description = L"<m>| <<m>m> | \\033[43m | <r><<r>r> Bold</r> <</r>/r> text | Выделение жирным |",
-        .details = {L"<m>| <<m>m>  <r><<r>r> Bold</r> <</r>/r> text                                   |",
-                    L"<ma>| <<ma>ma> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+        .details = {L"<m>| <<m>m>  <r><<r>r> Bold</r> <</r>/r> text                           |",
+                    L" <ma><r></r></> <</>ma><</>r><</>/r><</>/> <</>/ma> Invalid tag combination",
                     L"<mb>| <<mb>mb> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<mc>| <<mc>mc> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<md>| <<md>md> <r><<r>r> Bold</r> <</r>/r> text |",
@@ -284,15 +282,15 @@ void init_menu_items(MenuItem items[]) {
                     L"<mf>| <<mf>mf> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<mg>| <<mg>mg> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<mh>| <<mh>mh> <r><<r>r> Bold</r> <</r>/r> text |",
-                    L"<mi>| <<mi>mi> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+                    L" <mi><r></r></> <</>mi><</>r><</>/r><</>/> </</>mi> Invalid tag combination",
 },
         .detail_lines = 10
     };
 //  items[22]
     items[22] = (MenuItem){
         .description = L"<n>| <<n>n> | \\033[44m | <r><<r>r> Bold</r> <</r>/r> text | Выделение жирным |",
-        .details = {L"<n>| <<n>n>  <r><<r>r> Bold</r> <</r>/r> text                                   |",
-                    L"<na>| <<na>na> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+        .details = {L"<n>| <<n>n>  <r><<r>r> Bold</r> <</r>/r> text                           |",
+                    L" <na><r></r></> <</>na><</>r><</>/r><</>/> <</>/na> Invalid tag combination",
                     L"<nb>| <<nb>nb> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<nc>| <<nc>nc> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<nd>| <<nd>nd> <r><<r>r> Bold</r> <</r>/r> text |",
@@ -300,15 +298,15 @@ void init_menu_items(MenuItem items[]) {
                     L"<nf>| <<nf>nf> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<ng>| <<ng>ng> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<nh>| <<nh>nh> <r><<r>r> Bold</r> <</r>/r> text |",
-                    L"<ni>| <<ni>ni> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+                    L" <ni><r></r></> <</>ni><</>r><</>/r><</>/> <</>/ni> Invalid tag combination",
 },
         .detail_lines = 10
     };
 //  items[23]
     items[23] = (MenuItem){
         .description = L"<o>| <<o>o> | \\033[45m | <r><<r>r> Bold</r> <</r>/r> text | Выделение жирным |",
-        .details = {L"<o>| <<o>o>  <r><<r>r> Bold</r> <</r>/r> text                                   |",
-                    L"<oa>| <<oa>oa> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+        .details = {L"<o>| <<o>o>  <r><<r>r> Bold</r> <</r>/r> text                           |",
+                    L" <oa><r></r></> <</>oa><</>r><</>/r><</>/> <</>/oa> Invalid tag combination",
                     L"<ob>| <<ob>ob> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<oc>| <<oc>oc> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<od>| <<od>od> <r><<r>r> Bold</r> <</r>/r> text |",
@@ -316,15 +314,15 @@ void init_menu_items(MenuItem items[]) {
                     L"<of>| <<of>of> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<og>| <<og>og> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<oh>| <<oh>oh> <r><<r>r> Bold</r> <</r>/r> text |",
-                    L"<oi>| <<oi>oi> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+                    L" <oi><r></r></> <</>oi><</>r><</>/r><</>/> <</>/oi> Invalid tag combination",
 },
         .detail_lines = 10
     };
 //  items[24]
     items[24] = (MenuItem){
         .description = L"<p>| <<p>p> | \\033[45m | <r><<r>r> Bold</r> <</r>/r> text | Выделение жирным |",
-        .details = {L"<p>| <<p>p>  <r><<r>r> Bold</r> <</r>/r> text                                   |",
-                    L"<pa>| <<pa>pa> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+        .details = {L"<p>| <<p>p>  <r><<r>r> Bold</r> <</r>/r> text                           |",
+                    L" <pa><r></r></> <</>pa><</>r><</>/r><</>/> <</>/pa> Invalid tag combination",
                     L"<pb>| <<pb>pb> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<pc>| <<pc>pc> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<pd>| <<pd>pd> <r><<r>r> Bold</r> <</r>/r> text |",
@@ -332,15 +330,15 @@ void init_menu_items(MenuItem items[]) {
                     L"<pf>| <<pf>pf> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<pg>| <<pg>pg> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<ph>| <<ph>ph> <r><<r>r> Bold</r> <</r>/r> text |",
-                    L"<pi>| <<pi>pi> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+                    L" <pi><r></r></pi></> <</>pi><</>r><</>/r><</>/> <</>/pi> Invalid tag combination",
 },
         .detail_lines = 10
     };
 //  items[25]
     items[25] = (MenuItem){
         .description = L"<q>| <<q>q> | \\033[45m | <r><<r>r> Bold</r> <</r>/r> text | Выделение жирным |",
-        .details = {L"<q>| <<q>q>  <r><<r>r> Bold</r> <</r>/r> text                                   |",
-                    L"<qa>| <<qa>qa> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+        .details = {L"<q>| <<q>q>  <r><<r>r> Bold</r> <</r>/r> text                           |",
+                    L" <qa><r></r></> <</>qa><</>r><</>/r><</>/> <</>/qa> Invalid tag combination",
                     L"<qb>| <<qb>qb> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<qc>| <<qc>qc> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<qd>| <<qd>qd> <r><<r>r> Bold</r> <</r>/r> text |",
@@ -348,7 +346,7 @@ void init_menu_items(MenuItem items[]) {
                     L"<qf>| <<qf>qf> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<qg>| <<qg>qg> <r><<r>r> Bold</r> <</r>/r> text |",
                     L"<qh>| <<qh>qh> <r><<r>r> Bold</r> <</r>/r> text |",
-                    L"<qi>| <<qi>qi> <r><<r>r> Bold</r> <</r>/r> text |</> <b><error></b> Invalid tag combination",
+                    L" <qi><r></r></> <</>qi><</>r><</>/r><</>/> <</>/qi> Invalid tag combination",
 },
         .detail_lines = 10
     };
@@ -384,12 +382,12 @@ void init_menu_items(MenuItem items[]) {
 void print_menu_items(MenuItem items[], int offset, int selected) {
     int start_y = 6;
     // Очищаем область меню (только между рамками)
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 17; i++) {
         mvprintw(start_y + i, 2, "%*s", 61, ""); // Очистка от x=2 до x=61
     }
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 17; i++) {
         int item_index = offset + i;
-        if (item_index >= 29) break; //  Менять при изменении количества пунктов меню. Должно быть равно items[] количеству пунктов меню плюс один.
+        if (item_index >= 29) break; // if (item_index >= 29) break; (+) Менять при изменении количества пунктов меню. Должно быть равно items[] количеству пунктов меню плюс один.
         wchar_t desc_buf[1025];
         attr_t attributes[1024];
         int attr_count = 0;
@@ -413,7 +411,7 @@ void print_menu_items(MenuItem items[], int offset, int selected) {
             attroff(highlight_attr);
             int in_column = 0;
             int in_star = 0;
-            while (*ptr && x < 61 && y < start_y + 15) { // Ограничиваем до x=61
+            while (*ptr && x < 61 && y < start_y + 17) { // Ограничиваем до x=61
                 if (*ptr == L'\n') {
                     y++;
                     x = 3;
@@ -458,7 +456,7 @@ void print_menu_items(MenuItem items[], int offset, int selected) {
                 x++;
             }
         } else {
-            while (*ptr && x < 61 && y < start_y + 15) {
+            while (*ptr && x < 61 && y < start_y + 17) {
                 if (*ptr == L'\n') {
                     y++;
                     x = 3;
@@ -490,14 +488,14 @@ void handle_input(int ch, int *selected, int *offset, MenuItem items[]) {
             (*selected)--;
             if (*selected < 0) *selected = 28; // Менять при изменении количества пунктов меню. Должно быть равно items[] количеству пунктов меню.
             *offset = (*selected < *offset) ? *selected : *offset;
-            *offset = (*selected >= *offset + 15) ? *selected - 14 : *offset;
+            *offset = (*selected >= *offset + 17) ? *selected - 16 : *offset; // этот параметр должен быть -1 для плавной работы.
             print_menu_items(items, *offset, *selected);
             break;
         case KEY_DOWN:
             (*selected)++;
             if (*selected >= 29) *selected = 0; // Менять при изменении количества пунктов меню. Должно быть равно items[] количеству пунктов меню плюс один.
             *offset = (*selected < *offset) ? *selected : *offset;
-            *offset = (*selected >= *offset + 15) ? *selected - 14 : *offset; //
+            *offset = (*selected >= *offset + 17) ? *selected - 16 : *offset; // этот параметр должен быть -1 для плавной работы.
             print_menu_items(items, *offset, *selected);
             break;
         case 10:
